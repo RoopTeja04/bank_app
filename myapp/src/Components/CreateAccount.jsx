@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 
-const CreateAccount = ({ AccountsData, setAccountsData }) => {
+const CreateAccount = () => {
     const DefaultValues = {
         firstName: "",
         lastName: "",
@@ -67,18 +67,18 @@ const CreateAccount = ({ AccountsData, setAccountsData }) => {
                 const response = await axios.post("http://localhost:8045/api/users", userDetails);
 
                 if (response.status === 201 || response.status === 200) {
-                    setAccountsData([...AccountsData, userDetails]);
                     setUserDetails(DefaultValues);
                     setVisible(true);
                     setSuccess(true);
                 } else {
                     alert("Failed to create an account. Please try again.");
+                    return;
                 }
             } catch (error) {
                 console.error("Error creating account:", error);
                 alert("Error while creating the account. Please try again later.");
             } finally {
-                setLoading(false); // Hide loading indicator
+                setLoading(false);
             }
         } else {
             alert("Invalid input. Please check the details once again.");
