@@ -12,10 +12,10 @@ const CreateAccount = () => {
         accountType: "",
     };
 
-    const [userDetails, setUserDetails] = useState(DefaultValues);
-    const [visible, setVisible] = useState(true);
-    const [success, setSuccess] = useState(false);
-    const [loading, setLoading] = useState(false);
+    const [ userDetails, setUserDetails ] = useState(DefaultValues);
+    const [ visible, setVisible ] = useState(true);
+    const [ success, setSuccess ] = useState(false);
+    const [ loading, setLoading ] = useState(false);
 
     const handleGenerateAccountNumber = () => {
         let account_Number = "";
@@ -32,7 +32,6 @@ const CreateAccount = () => {
     const handleUserFormSubmit = async (e) => {
         e.preventDefault();
 
-        // Basic Validation
         if (
             !userDetails.firstName.trim() || !userDetails.lastName.trim() ||
             !userDetails.phoneNumber || !userDetails.emailId ||
@@ -48,7 +47,6 @@ const CreateAccount = () => {
             return;
         }
 
-        // Validation Checks
         const CheckNumber = String(userDetails.phoneNumber);
         const CheckFirstName = /^[A-Za-z\s]+$/.test(userDetails.firstName);
         const CheckLastName = /^[A-Za-z\s]+$/.test(userDetails.lastName);
@@ -62,7 +60,7 @@ const CreateAccount = () => {
             CheckEmailID &&
             /^\d+$/.test(CheckDeposit)
         ) {
-            setLoading(true); // Show loading indicator
+            setLoading(true);
             try {
                 const response = await axios.post("http://localhost:8045/api/users", userDetails);
 
@@ -99,7 +97,7 @@ const CreateAccount = () => {
                     <h1 className="font-semibold text-3xl tracking-wide">
                         Welcome New User
                     </h1>
-                    <label className="relative top-10 w-1/2 text-black">
+                    <label className="relative top-10 w-1/2 text-white">
                         <select
                             name="AccountType"
                             className="w-full px-4 py-2 border rounded-lg bg-white text-center text-black focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent hover:cursor-pointer tracking-wide font-bold uppercase text-lg"

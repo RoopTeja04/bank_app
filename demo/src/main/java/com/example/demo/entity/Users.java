@@ -1,5 +1,6 @@
 package com.example.demo.entity;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -16,7 +17,9 @@ public class Users {
     private String PhoneNumber;
     private String EmailId;
     private String Balance;
-    private String AccountNumber;
+
+    @Column(unique = true, nullable = false)
+    private String accountNumber;
     private String AccountType;
 
     public long getId() {
@@ -56,10 +59,10 @@ public class Users {
         Balance = balance;
     }
     public String getAccountNumber() {
-        return AccountNumber;
+        return accountNumber;
     }
     public void setAccountNumber(String accountNumber) {
-        AccountNumber = accountNumber;
+        this.accountNumber = accountNumber;
     }
     public String getAccountType() {
         return AccountType;
@@ -76,7 +79,7 @@ public class Users {
             this.PhoneNumber = phoneNumber;
             this.EmailId = emailId;
             this.Balance = balance;
-            this.AccountNumber = accountNumber;
+            this.accountNumber = accountNumber;
             this.AccountType = accountType;
     }
 
@@ -86,7 +89,7 @@ public class Users {
     @Override
     public String toString() {
         return "Users [id=" + id + ", FirstName=" + FirstName + ", LastName=" + LastName + ", PhoneNumber=" + PhoneNumber
-                + ", EmailId=" + EmailId + ", Balance=" + Balance + ", AccountNumber=" + AccountNumber
+                + ", EmailId=" + EmailId + ", Balance=" + Balance + ", AccountNumber=" + accountNumber
                 + ", AccountType=" + AccountType + "]";
     }
 

@@ -1,32 +1,35 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
+import axios from 'axios';
 
-const UpdateAccount = ({ AccountsData, setAccountsData }) => {
+const UpdateAccount = () => {
     const [searchAccountNumber, setSearchAccountNumber] = useState('');
     const [searchResult, setSearchResult] = useState(null);
     const [edit, setEdit] = useState(false);
     const [updatedAccount, setUpdatedAccount] = useState(null);
 
-    const handleSearchAccountNumber = (e) => {
+    const handleSearchAccountNumber = async (e) => {
         e.preventDefault();
 
-        if (!searchAccountNumber) {
+        if (!searchAccountNumber.trim()) {
             alert("enter the fields first!...");
             return;
         }
-        else {
-            const account = AccountsData.find(
-                (account) => Number(account.AccountNumber) === Number(searchAccountNumber)
-            );
+        
+        try{
+            const response = await axios.get(`http://localhost:8045/api/users/${searchAccountNumber}`);
 
-            if (account) {
-                setSearchResult(account);
-                setUpdatedAccount({ ...account });
-                setEdit(false);
-            } else {
-                setSearchResult('Account not found');
+            if(response.status === 200){
+                setSearchResult(response.data);
+                setUpdatedAccount(response.data)
             }
+            return;
         }
+        catch(err){
+            setSearchResult("Account Not Found!...");
+            return;
+        }
+
     };
 
     const handleUpdateChange = (e) => {
@@ -34,17 +37,19 @@ const UpdateAccount = ({ AccountsData, setAccountsData }) => {
         setUpdatedAccount((prev) => ({ ...prev, [name]: value }));
     };
 
-    const handleUpdateAccount = (e) => {
+    const handleUpdateAccount = async (e) => {
         e.preventDefault();
 
-        setAccountsData((prevAccounts) =>
-            prevAccounts.map((account) =>
-                account.AccountNumber === updatedAccount.AccountNumber ? { ...updatedAccount } : account
-            )
-        );
-
-        setSearchResult(updatedAccount);
-        setEdit(false);
+        try{
+            const response = await axios.put(`http://localhost:8045/api/update/users/${searchAccountNumber}`, updatedAccount);
+            console.log(response);
+            setSearchResult(updatedAccount);
+            setEdit(false);
+        }
+        catch(err){
+            alert("Failed to update account. Please try again.");
+        }
+    
     };
 
     return (
@@ -59,7 +64,6 @@ const UpdateAccount = ({ AccountsData, setAccountsData }) => {
             </motion.h1>
 
             <motion.form
-                onSubmit={handleSearchAccountNumber}
                 className='flex flex-col w-full items-center justify-center mt-14 space-y-6'
                 initial={{ opacity: 0, y: -50 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -74,6 +78,7 @@ const UpdateAccount = ({ AccountsData, setAccountsData }) => {
                     className="text-xl px-4 py-2 w-1/4 border-b-2 bg-transparent focus:outline-none font-semibold focus:border-green-600 tracking-wider text-center"
                 />
                 <button
+                    onClick={handleSearchAccountNumber}
                     type="submit"
                     className='border-2 border-white w-1/6 h-12 text-2xl font-semibold tracking-wide rounded-xl backdrop-blur-lg transition-all duration-200 ease-linear cursor-pointer'
                 >
@@ -104,8 +109,8 @@ const UpdateAccount = ({ AccountsData, setAccountsData }) => {
                                     First Name
                                     <input
                                         type="text"
-                                        name="FirstName"
-                                        value={updatedAccount.FirstName}
+                                        name="firstName"
+                                        value={updatedAccount.firstName}
                                         onChange={handleUpdateChange}
                                         required
                                         className="text-xl px-4 py-2 w-full border-b-2 bg-transparent focus:outline-none font-semibold focus:border-green-600 tracking-wider text-center"
@@ -115,8 +120,8 @@ const UpdateAccount = ({ AccountsData, setAccountsData }) => {
                                     Last Name
                                     <input
                                         type="text"
-                                        name="LastName"
-                                        value={updatedAccount.LastName}
+                                        name="lastName"
+                                        value={updatedAccount.lastName}
                                         onChange={handleUpdateChange}
                                         required
                                         className="text-xl px-4 py-2 w-full border-b-2 bg-transparent focus:outline-none font-semibold focus:border-green-600 tracking-wider text-center"
@@ -126,9 +131,10 @@ const UpdateAccount = ({ AccountsData, setAccountsData }) => {
                                     Phone Number
                                     <input
                                         type="text"
-                                        name="PhoneNumber"
-                                        value={updatedAccount.PhoneNumber}
+                                        name="phoneNumber"
+                                        value={updatedAccount.phoneNumber}
                                         onChange={handleUpdateChange}
+                                        maxLength={10}
                                         required
                                         className="text-xl px-4 py-2 w-full border-b-2 bg-transparent focus:outline-none font-semibold focus:border-green-600 tracking-wider text-center"
                                     />
@@ -137,8 +143,8 @@ const UpdateAccount = ({ AccountsData, setAccountsData }) => {
                                     Email
                                     <input
                                         type="email"
-                                        name="EmailId"
-                                        value={updatedAccount.EmailId}
+                                        name="emailId"
+                                        value={updatedAccount.emailId}
                                         onChange={handleUpdateChange}
                                         required
                                         className="text-xl px-4 py-2 w-full border-b-2 bg-transparent focus:outline-none font-semibold focus:border-green-600 tracking-wider text-center"
@@ -147,12 +153,6 @@ const UpdateAccount = ({ AccountsData, setAccountsData }) => {
                             </motion.form>
                             <motion.button
                                 type="submit"
-                                disabled={
-                                    !updatedAccount.FirstName ||
-                                    !updatedAccount.LastName ||
-                                    !updatedAccount.PhoneNumber ||
-                                    !updatedAccount.EmailId
-                                }
                                 onClick={handleUpdateAccount}
                                 className="bg-green-600 text-white px-6 py-2 rounded-md hover:bg-green-700 mt-10"
                                 initial={{ opacity: 0 }}
@@ -169,10 +169,10 @@ const UpdateAccount = ({ AccountsData, setAccountsData }) => {
                             animate={{ opacity: 1 }}
                             transition={{ duration: 0.5 }}
                         >
-                            <p className='text-base'>First Name: <span className="font-semibold text-2xl tracking-wide">{searchResult.FirstName}</span></p>
-                            <p className='text-base'>Last Name: <span className="font-semibold text-2xl tracking-wide">{searchResult.LastName}</span></p>
-                            <p className='text-base'>Phone Number: <span className="font-semibold text-2xl tracking-wide">{searchResult.PhoneNumber}</span></p>
-                            <p className='text-base'>E-Mail ID: <span className="font-semibold text-2xl tracking-wide">{searchResult.EmailId}</span></p>
+                            <p className='text-base'>First Name: <span className="font-semibold text-2xl tracking-wide">{searchResult.firstName}</span></p>
+                            <p className='text-base'>Last Name: <span className="font-semibold text-2xl tracking-wide">{searchResult.lastName}</span></p>
+                            <p className='text-base'>Phone Number: <span className="font-semibold text-2xl tracking-wide">{searchResult.phoneNumber}</span></p>
+                            <p className='text-base'>E-Mail ID: <span className="font-semibold text-2xl tracking-wide">{searchResult.emailId}</span></p>
                             <motion.button
                                 onClick={() => setEdit(true)}
                                 className="bg-blue-400 text-black px-4 py-2 rounded-lg w-1/2 text-xl font-semibold hover:bg-blue-700 hover:text-white relative top-8 transition-all duration-200"

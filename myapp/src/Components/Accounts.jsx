@@ -44,7 +44,7 @@ const Accounts = () => {
     }
 
     return (
-        <div className="relative text-white flex flex-col items-center top-14">
+        <div className="mt-16 pb-12 min-h-screen text-white flex flex-col items-center top-14">
             <h1 className="text-3xl font-semibold tracking-wider underline underline-offset-8 pb-2">
                 Accounts of Bankera
             </h1>

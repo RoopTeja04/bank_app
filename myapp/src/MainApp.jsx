@@ -12,11 +12,8 @@ const MainApp = () => {
 
     return (
         <>
-            <div className='relative min-h-screen'>
-                <div className='absolute inset-0 bg-gradient-to-br from-gray-600 via-blue-800 to-gray-500 bg-center w-full z-0 min-h-screen'></div>
-                <div className="absolute inset-0 bg-opacity-45 z-0 min-h-screen"></div>
-
-                <div className='relative text-white font-All-Font tracking-wider z-10'>
+            <div className='min-h-screen bg-slate-800'>
+                <div className='text-white font-All-Font tracking-wider z-10'>
                     <div className='flex flex-row items-center pt-4 px-8 justify-between'>
                         <div className='flex items-center cursor-pointer'>
                             <h1 className='text-4xl pl-2 font-semibold tracking-wide'>Bankera</h1>
