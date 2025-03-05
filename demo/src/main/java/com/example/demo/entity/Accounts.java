@@ -7,7 +7,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 
 @Entity
-public class Users {
+public class Accounts {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -70,7 +70,8 @@ public class Users {
     public void setAccountType(String accountType) {
         AccountType = accountType;
     }
-    public Users(long id, String firstName, String lastName, String phoneNumber, String emailId, String balance,
+    
+    public Accounts(long id, String firstName, String lastName, String phoneNumber, String emailId, String balance,
             String accountNumber, String accountType) {
             super();
             this.id = id;
@@ -83,7 +84,7 @@ public class Users {
             this.AccountType = accountType;
     }
 
-    public Users(){
+    public Accounts(){
         super();
     }
     @Override

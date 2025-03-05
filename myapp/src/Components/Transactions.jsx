@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import SwapHorizRoundedIcon from '@mui/icons-material/SwapHorizRounded';
+import axios from 'axios';
 
 const Transactions = ({ AccountsData, setAccountsData }) => {
     const defaultTransferValues = {
@@ -18,14 +19,11 @@ const Transactions = ({ AccountsData, setAccountsData }) => {
     const [toAccount, setToAccount] = useState(null);
     const [visible, setVisible] = useState(false);
 
-    const handleTransfer = (e) => {
+    const handleTransfer = async (e) => {
         e.preventDefault();
 
-        const fromAccountNum = Number(transferAccountNumbers.FromAccountNumber.trim());
-        const toAccountNum = Number(transferAccountNumbers.ToAccountNumber.trim());
-
-        const Fromnumber = String(fromAccountNum);
-        const ToNumber = String(toAccountNum);
+        const fromAccountNum = transferAccountNumbers.FromAccountNumber.trim();
+        const toAccountNum = transferAccountNumbers.ToAccountNumber.trim();
 
         if (!fromAccountNum || !toAccountNum) {
             alert("enter the fields first!...");
@@ -35,39 +33,39 @@ const Transactions = ({ AccountsData, setAccountsData }) => {
             alert('From and To Account Numbers are the same. Transfer is not allowed.');
             return;
         }
-        else if (Fromnumber.length !== 12) {
+        else if (fromAccountNum.length !== 12) {
             alert(`${fromAccountNum} InValid Number. Please check the number once!...`);
             return;
         }
-        else if (ToNumber.length !== 12) {
+        else if (toAccountNum.length !== 12) {
             alert(`${toAccountNum} InValid Number. Please check the number once!...`);
             return;
         }
 
-        const findFromAccountNumber = AccountsData.find(
-            (account) => Number(account.AccountNumber) === fromAccountNum
-        );
-        const findToAccountNumber = AccountsData.find(
-            (account) => Number(account.AccountNumber) === toAccountNum
-        );
-
-        if (!findFromAccountNumber) {
-            alert(`From Account Number (${fromAccountNum}) doesn't exist!`);
-            return;
+        try {
+            const foundedFromAccount = await axios.get(`http://localhost:8045/api/users/${fromAccountNum}`);
+            const foundedToAccount = await axios.get(`http://localhost:8045/api/users/${toAccountNum}`);
+            setTransferAccountNumbers(defaultTransferAmount);
+            setTransferAmount(defaultTransferAmount)
+            setFromAccount(foundedFromAccount.data);
+            setToAccount(foundedToAccount.data);
+            setVisible(true);
+        }
+        catch (err) {
+            if (!fromAccountNum) {
+                alert(`From Account Number ${fromAccountNum} doesn't exist!`);
+                return;
+            }
+            else {
+                alert(`To Account Number ${toAccountNum} doesn't exist!`);
+                return;
+            }
         }
 
-        if (!findToAccountNumber) {
-            alert(`To Account Number (${toAccountNum}) doesn't exist!`);
-            return;
-        }
-
-        setFromAccount(findFromAccountNumber);
-        setToAccount(findToAccountNumber);
         alert('Accounts validated. You can proceed with the transfer.');
-        setVisible(true);
     };
 
-    const handleAmount = (e) => {
+    const handleAmount = async (e) => {
         e.preventDefault();
 
         if (!TransferAmount.Amount || isNaN(TransferAmount.Amount) || TransferAmount.Amount <= 0) {
@@ -75,57 +73,28 @@ const Transactions = ({ AccountsData, setAccountsData }) => {
             return;
         }
 
-        if (fromAccount && toAccount) {
-            if (Number(fromAccount.Balance) >= Number(TransferAmount.Amount)) {
-                const updatedAccounts = [...AccountsData];
+        if (Number(fromAccount.balance) >= Number(TransferAmount.Amount)) {
 
-                const fromAccountIndex = updatedAccounts.findIndex(
-                    (account) => account.AccountNumber === fromAccount.AccountNumber
-                );
-                const toAccountIndex = updatedAccounts.findIndex(
-                    (account) => account.AccountNumber === toAccount.AccountNumber
-                );
+            fromAccount.balance = Number(fromAccount.balance) - Number(TransferAmount.Amount);
+            toAccount.balance = Number(toAccount.balance) + Number(TransferAmount.Amount);
 
-                updatedAccounts[fromAccountIndex].Balance =
-                    Number(updatedAccounts[fromAccountIndex].Balance) - Number(TransferAmount.Amount);
-                updatedAccounts[toAccountIndex].Balance =
-                    Number(updatedAccounts[toAccountIndex].Balance) + Number(TransferAmount.Amount);
-
-                const transactionTime = new Date().toLocaleString();
-                const fromTransactionDetails = {
-                    DateTime: transactionTime,
-                    Amount: TransferAmount.Amount,
-                    Type: 'Debit',
-                };
-
-                const toTransactionDetails = {
-                    DateTime: transactionTime,
-                    Amount: TransferAmount.Amount,
-                    Type: 'Credit',
-                };
-
-                updatedAccounts[fromAccountIndex].Transactions = [
-                    ...(updatedAccounts[fromAccountIndex].Transactions || []),
-                    fromTransactionDetails,
-                ];
-                updatedAccounts[toAccountIndex].Transactions = [
-                    ...(updatedAccounts[toAccountIndex].Transactions || []),
-                    toTransactionDetails,
-                ];
-
-                setAccountsData(updatedAccounts);
-
-                alert('Transfer Successful!');
-
-                setTransferAccountNumbers(defaultTransferValues);
+            try {
+                const responseFromAccount = await axios.put(`http://localhost:8045/api/updatebalances-from/${fromAccount.accountNumber}`, fromAccount);
+                const responseToAccount = await axios.put(`http://localhost:8045/api/updatebalances-to/${toAccount.accountNumber}`, toAccount); 
                 setTransferAmount(defaultTransferAmount);
                 setFromAccount(null);
                 setToAccount(null);
-            } else {
-                alert('Insufficient balance in From Account!');
+                console.log(fromAccount, toAccount);
+                alert('Amount transferred successfully!...');
+                setVisible(false);
+                return;
+            }
+            catch(err){
+                alert('network error!... Please try again.');
+                return;
             }
         } else {
-            alert('Search accounts before transferring the amount.');
+            alert('Insufficient balance in From Account!');
         }
     };
 

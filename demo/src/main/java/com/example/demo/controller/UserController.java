@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.Repo.UsersRepo;
-import com.example.demo.entity.Users;
+import com.example.demo.entity.Accounts;
 
 @RestController
 @CrossOrigin(origins = "http://localhost:5173/")
@@ -25,18 +25,18 @@ public class UserController {
     UsersRepo userrepo;
 
     @PostMapping("/api/users")
-    public ResponseEntity<Users> saveUser(@RequestBody Users users) {
+    public ResponseEntity<Accounts> saveUser(@RequestBody Accounts users) {
         return new ResponseEntity<>(userrepo.save(users), HttpStatus.CREATED);
     }
 
     @GetMapping("/api/users")
-    public ResponseEntity<List<Users>> getUsers() {
+    public ResponseEntity<List<Accounts>> getUsers() {
         return new ResponseEntity<>(userrepo.findAll(), HttpStatus.OK);
     }
 
     @GetMapping("/api/users/{accountNumber}")
-    public ResponseEntity<Users> getUser(@PathVariable String accountNumber) {
-        Optional<Users> user  = userrepo.findByAccountNumber(accountNumber);
+    public ResponseEntity<Accounts> getUser(@PathVariable String accountNumber) {
+        Optional<Accounts> user  = userrepo.findByAccountNumber(accountNumber);
         if(user.isPresent()){
             return new ResponseEntity<>(user.get(), HttpStatus.OK);
         }
@@ -46,14 +46,40 @@ public class UserController {
     }
 
     @PutMapping("/api/update/users/{accountNumber}")
-    public ResponseEntity<Users> updateUser(@PathVariable String accountNumber, @RequestBody Users userAccount) {
-        Optional<Users> user  = userrepo.findByAccountNumber(accountNumber);
+    public ResponseEntity<Accounts> updateUser(@PathVariable String accountNumber, @RequestBody Accounts userAccount) {
+        Optional<Accounts> user  = userrepo.findByAccountNumber(accountNumber);
         if(user.isPresent()){
             user.get().setFirstName(userAccount.getFirstName());
             user.get().setLastName(userAccount.getLastName());
             user.get().setEmailId(userAccount.getEmailId());
             user.get().setPhoneNumber(userAccount.getPhoneNumber());
             return new ResponseEntity<>(userrepo.save(user.get()), HttpStatus.OK);
+        }
+        else{
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @PutMapping("/api/updatebalances-from/{fromaccountNumber}")
+    public ResponseEntity<Accounts> updateFromBalances(@PathVariable String fromaccountNumber, @RequestBody Accounts userAccount) {
+        Optional<Accounts> Fromuser  = userrepo.findByAccountNumber(fromaccountNumber);
+        if (Fromuser.isPresent()) {
+            Fromuser.get().setBalance(userAccount.getBalance());
+            userrepo.save(Fromuser.get());  
+            return new ResponseEntity<>(HttpStatus.OK);
+        }
+        else{
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @PutMapping("/api/updatebalances-to/{toaccountnumber}")
+    public ResponseEntity<Accounts> updateToBalances(@PathVariable String toaccountnumber, @RequestBody Accounts userAccount) {
+        Optional<Accounts> Touser  = userrepo.findByAccountNumber(toaccountnumber);
+        if (Touser.isPresent()) {
+            Touser.get().setBalance(userAccount.getBalance());
+            userrepo.save(Touser.get());  
+            return new ResponseEntity<>(HttpStatus.OK);
         }
         else{
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);

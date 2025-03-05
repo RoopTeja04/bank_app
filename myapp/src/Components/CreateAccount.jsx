@@ -47,11 +47,11 @@ const CreateAccount = () => {
             return;
         }
 
-        const CheckNumber = String(userDetails.phoneNumber);
+        const CheckNumber = userDetails.phoneNumber;
         const CheckFirstName = /^[A-Za-z\s]+$/.test(userDetails.firstName);
         const CheckLastName = /^[A-Za-z\s]+$/.test(userDetails.lastName);
         const CheckEmailID = /^[A-Za-z0-9._%+-]+@gmail\.com$/.test(userDetails.emailId);
-        const CheckDeposit = String(userDetails.balance);
+        const CheckDeposit = userDetails.balance;
 
         if (
             /^\d{10}$/.test(CheckNumber) &&
