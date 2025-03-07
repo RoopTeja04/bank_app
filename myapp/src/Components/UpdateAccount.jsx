@@ -18,7 +18,6 @@ const UpdateAccount = () => {
         
         try{
             const response = await axios.get(`http://localhost:8045/api/users/${searchAccountNumber}`);
-
             if(response.status === 200){
                 setSearchResult(response.data);
                 setUpdatedAccount(response.data)
@@ -26,7 +25,7 @@ const UpdateAccount = () => {
             return;
         }
         catch(err){
-            setSearchResult("Account Not Found!...");
+            setSearchResult("Account Not Found!");
             return;
         }
 
@@ -42,7 +41,6 @@ const UpdateAccount = () => {
 
         try{
             const response = await axios.put(`http://localhost:8045/api/update/users/${searchAccountNumber}`, updatedAccount);
-            console.log(response);
             setSearchResult(updatedAccount);
             setEdit(false);
         }
@@ -53,9 +51,9 @@ const UpdateAccount = () => {
     };
 
     return (
-        <div className='text-white relative top-14 flex flex-col items-center w-full'>
+        <div className='text-white mt-10 flex flex-col items-center w-full px-2 pb-10'>
             <motion.h1
-                className="text-3xl font-semibold tracking-wide"
+                className="text-3xl font-semibold tracking-wide text-center"
                 initial={{ opacity: 0, y: -50 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5 }}
@@ -64,7 +62,7 @@ const UpdateAccount = () => {
             </motion.h1>
 
             <motion.form
-                className='flex flex-col w-full items-center justify-center mt-14 space-y-6'
+                className='flex flex-col w-full items-center justify-center mt-10 space-y-6'
                 initial={{ opacity: 0, y: -50 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5 }}
@@ -75,12 +73,12 @@ const UpdateAccount = () => {
                     value={searchAccountNumber}
                     onChange={(e) => setSearchAccountNumber(e.target.value)}
                     minLength={12}
-                    className="text-xl px-4 py-2 w-1/4 border-b-2 bg-transparent focus:outline-none font-semibold focus:border-green-600 tracking-wider text-center"
+                    className="text-xl px-4 py-2 w-2/3 md:w-1/3 border-b-2 bg-transparent focus:outline-none font-semibold focus:border-green-600 tracking-wider text-center"
                 />
                 <button
                     onClick={handleSearchAccountNumber}
                     type="submit"
-                    className='border-2 border-white w-1/6 h-12 text-2xl font-semibold tracking-wide rounded-xl backdrop-blur-lg transition-all duration-200 ease-linear cursor-pointer'
+                    className='border-2 border-white w-2/3 md:w-1/6 h-12 mt-4 text-xl md:text-2xl font-semibold tracking-wide rounded-xl backdrop-blur-lg transition-all duration-200 ease-linear cursor-pointer'
                 >
                     Search
                 </button>
@@ -90,7 +88,7 @@ const UpdateAccount = () => {
                 <>
                     {typeof searchResult === 'string' ? (
                         <motion.p
-                            className="text-red-600 mt-10 text-4xl backdrop-blur-xl px-20 py-8 rounded-md border-2 border-red-600 capitalize"
+                            className="text-red-600 mt-8 mx-10 text-4xl backdrop-blur-xl px-10 py-4 font-semibold rounded-md border-2 border-red-600 capitalize text-center"
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             transition={{ duration: 0.5 }}
@@ -100,7 +98,7 @@ const UpdateAccount = () => {
                     ) : edit ? (
                         <>
                             <motion.form
-                                className="grid grid-cols-2 mt-16 gap-x-11 gap-y-10"
+                                className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-14 relative top-8 w-full px-6 md:px-10 md:w-1/2"
                                 initial={{ opacity: 0, y: -50 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ duration: 0.5 }}
@@ -113,7 +111,7 @@ const UpdateAccount = () => {
                                         value={updatedAccount.firstName}
                                         onChange={handleUpdateChange}
                                         required
-                                        className="text-xl px-4 py-2 w-full border-b-2 bg-transparent focus:outline-none font-semibold focus:border-green-600 tracking-wider text-center"
+                                        className="text-lg px-4 py-2 w-full border-b-2 bg-transparent focus:outline-none font-semibold focus:border-green-600 tracking-wider text-center"
                                     />
                                 </label>
                                 <label className='flex flex-col'>
@@ -124,7 +122,7 @@ const UpdateAccount = () => {
                                         value={updatedAccount.lastName}
                                         onChange={handleUpdateChange}
                                         required
-                                        className="text-xl px-4 py-2 w-full border-b-2 bg-transparent focus:outline-none font-semibold focus:border-green-600 tracking-wider text-center"
+                                        className="text-lg px-4 py-2 w-full border-b-2 bg-transparent focus:outline-none font-semibold focus:border-green-600 tracking-wider text-center"
                                     />
                                 </label>
                                 <label className='flex flex-col'>
@@ -136,7 +134,7 @@ const UpdateAccount = () => {
                                         onChange={handleUpdateChange}
                                         maxLength={10}
                                         required
-                                        className="text-xl px-4 py-2 w-full border-b-2 bg-transparent focus:outline-none font-semibold focus:border-green-600 tracking-wider text-center"
+                                        className="text-lg px-4 py-2 w-full border-b-2 bg-transparent focus:outline-none font-semibold focus:border-green-600 tracking-wider text-center"
                                     />
                                 </label>
                                 <label className='flex flex-col'>
@@ -147,14 +145,14 @@ const UpdateAccount = () => {
                                         value={updatedAccount.emailId}
                                         onChange={handleUpdateChange}
                                         required
-                                        className="text-xl px-4 py-2 w-full border-b-2 bg-transparent focus:outline-none font-semibold focus:border-green-600 tracking-wider text-center"
+                                        className="text-lg px-4 py-2 w-full border-b-2 bg-transparent focus:outline-none font-semibold focus:border-green-600 tracking-wider text-center"
                                     />
                                 </label>
                             </motion.form>
                             <motion.button
                                 type="submit"
                                 onClick={handleUpdateAccount}
-                                className="bg-green-600 text-white px-6 py-2 rounded-md hover:bg-green-700 mt-10"
+                                className="bg-green-600 text-white px-10 py-2 rounded-md hover:bg-green-700 mt-18"
                                 initial={{ opacity: 0 }}
                                 animate={{ opacity: 1 }}
                                 transition={{ duration: 0.5 }}
@@ -164,7 +162,7 @@ const UpdateAccount = () => {
                         </>
                     ) : (
                         <motion.div
-                            className="grid grid-cols-2 mt-16 gap-y-4 backdrop-blur-lg p-10"
+                            className="grid grid-cols-1 md:grid-cols-2 mt-4 md:mt-4 gap-4 backdrop-blur-lg p-6 md:p-10 w-full md:w-3/4 text-center md:text-left"
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             transition={{ duration: 0.5 }}
@@ -175,7 +173,7 @@ const UpdateAccount = () => {
                             <p className='text-base'>E-Mail ID: <span className="font-semibold text-2xl tracking-wide">{searchResult.emailId}</span></p>
                             <motion.button
                                 onClick={() => setEdit(true)}
-                                className="bg-blue-400 text-black px-4 py-2 rounded-lg w-1/2 text-xl font-semibold hover:bg-blue-700 hover:text-white relative top-8 transition-all duration-200"
+                                className="relative md:left-120 bg-blue-400 text-black px-6 py-3 rounded-lg w-full md:w-1/4 text-xl font-semibold hover:bg-blue-700 hover:text-white mt-6 text-center"
                                 initial={{ opacity: 0 }}
                                 animate={{ opacity: 1 }}
                                 transition={{ duration: 0.5 }}
