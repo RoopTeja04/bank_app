@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import SwapHorizRoundedIcon from '@mui/icons-material/SwapHorizRounded';
 import axios from 'axios';
 
-const Transactions = ({ AccountsData, setAccountsData }) => {
+const Transactions = () => {
     const defaultTransferValues = {
         FromAccountNumber: '',
         ToAccountNumber: '',
@@ -45,7 +45,7 @@ const Transactions = ({ AccountsData, setAccountsData }) => {
         try {
             const foundedFromAccount = await axios.get(`http://localhost:8045/api/users/${fromAccountNum}`);
             const foundedToAccount = await axios.get(`http://localhost:8045/api/users/${toAccountNum}`);
-            setTransferAccountNumbers(defaultTransferAmount);
+            
             setTransferAmount(defaultTransferAmount)
             setFromAccount(foundedFromAccount.data);
             setToAccount(foundedToAccount.data);
@@ -79,8 +79,9 @@ const Transactions = ({ AccountsData, setAccountsData }) => {
             toAccount.balance = Number(toAccount.balance) + Number(TransferAmount.Amount);
 
             try {
-                const responseFromAccount = await axios.put(`http://localhost:8045/api/updatebalances-from/${fromAccount.accountNumber}`, fromAccount);
-                const responseToAccount = await axios.put(`http://localhost:8045/api/updatebalances-to/${toAccount.accountNumber}`, toAccount); 
+                const responseFromAccount = await axios.put(`http://localhost:8045/api/updatebalances-from/${fromAccount.accountNumber}/${toAccount.accountNumber}/${TransferAmount.Amount}`, fromAccount);
+                const responseToAccount = await axios.put(`http://localhost:8045/api/updatebalances-to/${toAccount.accountNumber}/${fromAccount.accountNumber}/${TransferAmount.Amount}`, toAccount); 
+                setTransferAccountNumbers(defaultTransferValues);
                 setTransferAmount(defaultTransferAmount);
                 setFromAccount(null);
                 setToAccount(null);

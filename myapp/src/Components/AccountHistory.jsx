@@ -9,6 +9,7 @@ const AccountHistory = () => {
     const [foundedAccount, setFoundedAccount] = useState(null);
     const [visible, setVisible] = useState(false);
     const [loading, setLoading] = useState(false);
+    const [transactions, setTransactions] = useState([]);
 
     const handleSearch = async (e) => {
         e.preventDefault();
@@ -23,7 +24,11 @@ const AccountHistory = () => {
 
         try {
             const response = await axios.get(`http://localhost:8045/api/users/${searchNumber}`);
+            const transactiosResponse = await axios.get(`http://localhost:8045/api/transactions`);
+            const Transactions = transactiosResponse.data.filter((account) => (account.transactionsType.toUpperCase() === "DEBIT" && account.fromAccountNumber === searchNumber) || (account.transactionsType.toUpperCase() === "CREDIT" && account.toAccountNumber === searchNumber));
+            setTransactions(Transactions);
             setFoundedAccount(response.data || null);
+            setSearchNumber("");
         } catch (err) {
             console.error("Error fetching account:", err);
             setFoundedAccount(null);
@@ -31,10 +36,11 @@ const AccountHistory = () => {
             setLoading(false);
             setVisible(true);
         }
+
     };
 
     return (
-        <motion.div className="relative flex flex-col items-center text-white w-screen top-14" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 1 }}>
+        <motion.div className="flex flex-col items-center text-white mt-28 min-h-screen pb-14 overflow-x-hidden" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 1 }}>
             <h1 className="text-3xl font-semibold tracking-wide">Account History</h1>
             <div className="w-screen flex flex-col justify-center items-center relative top-10">
                 <input
@@ -54,7 +60,7 @@ const AccountHistory = () => {
                 </button>
 
                 {visible && (
-                    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }}>
+                    <motion.div className='min-h-screen' initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }}>
                         {foundedAccount ? (
                             <motion.div className="relative top-8 border-white backdrop-blur-md p-6 rounded-lg">
                                 <h1 className="text-4xl font-semibold tracking-widest pb-2 uppercase text-center">
@@ -70,18 +76,30 @@ const AccountHistory = () => {
                                     <span>Phone: <span className="text-2xl font-medium">{foundedAccount.phoneNumber}</span></span>
                                 </div>
 
-                                {foundedAccount.transactions && foundedAccount.transactions.length > 0 ? (
+                                {transactions && transactions.length > 0 ? (
                                     <div className="mt-6">
                                         <h2 className="text-2xl font-bold underline mb-4 text-center">Transaction History</h2>
-                                        <ul className="bg-gray-800 p-4 rounded-md shadow-md text-white">
-                                            {foundedAccount.transactions.map((transaction, idx) => (
+                                        <ul className="bg-gray-800 pb-4 rounded-md shadow-md text-white">
+                                            {transactions.map((transaction, idx) => (
                                                 <li key={idx} className="flex justify-between px-4 py-6 border-b border-gray-600 last:border-none">
-                                                    <span className="text-base font-medium text-gray-300 tracking-wider">{transaction.dateTime}</span>
-                                                    <span className={`text-base font-semibold ${transaction.type === 'Debit' ? 'text-red-600' : 'text-green-600'}`}>
-                                                        {transaction.type === 'Debit' ? <ArrowUpwardIcon /> : <ArrowDownwardIcon />} {transaction.type}
+                                                    <span className="text-base font-medium text-gray-300 tracking-wider">
+                                                        {new Date(transaction.transactionsDate).toLocaleString('en-US', {
+                                                            weekday: 'short',
+                                                            year: 'numeric',
+                                                            month: 'short',
+                                                            day: 'numeric',
+                                                            hour: '2-digit',
+                                                            minute: '2-digit'
+                                                        })}
                                                     </span>
-                                                    <span className={`text-base font-medium ${transaction.type === 'Debit' ? 'text-red-600' : 'text-green-600'}`}>
-                                                        ₹ {Number(transaction.amount).toLocaleString('hi-IN')} /-
+                                                    <span className={`text-base font-semibold ${transaction.transactionsType === 'DEBIT' ? 'text-red-600' : 'text-green-600'}`}>
+                                                        {transaction.transactionsType === 'DEBIT' ? <ArrowUpwardIcon /> : <ArrowDownwardIcon />} {transaction.transactionsType}
+                                                    </span>
+                                                    <span className="text-base font-semibold text-white">
+                                                        {transaction.transactionsType === 'DEBIT' ? transaction.toAccountNumber : transaction.fromAccountNumber } 
+                                                    </span>
+                                                    <span className={`text-base font-medium ${transaction.transactionsType === 'DEBIT' ? 'text-red-600' : 'text-green-600'}`}>
+                                                        ₹ {Number(transaction.transferAmount).toLocaleString('hi-IN')} /-
                                                     </span>
                                                 </li>
                                             ))}

@@ -8,8 +8,6 @@ import Accounts from './Components/Accounts';
 
 const MainApp = () => {
 
-    const [ AccountsData, setAccountsData ] = useState([]) || null;
-
     return (
         <>
             <div className='min-h-screen bg-slate-800'>
@@ -50,11 +48,11 @@ const MainApp = () => {
 
                 <div className="relative z-10">
                     <Routes>
-                        <Route path='/' element={<CreateAccount AccountsData = {AccountsData} setAccountsData={setAccountsData} />} />
-                        <Route path='/transactions' element={<Transactions AccountsData = {AccountsData} setAccountsData={setAccountsData} />} />
-                        <Route path='/update-account' element={<UpdateAccount AccountsData = {AccountsData} setAccountsData={setAccountsData} />} />
-                        <Route path='/account-history' element={<AccountHistory AccountsData = {AccountsData} />} /> 
-                        <Route path='/accounts' element={<Accounts AccountsData = {AccountsData} />} />
+                        <Route path='/' element={<CreateAccount />} />
+                        <Route path='/transactions' element={<Transactions />} />
+                        <Route path='/update-account' element={<UpdateAccount />} />
+                        <Route path='/account-history' element={<AccountHistory />} /> 
+                        <Route path='/accounts' element={<Accounts />} />
                     </Routes>
                 </div>
             </div>

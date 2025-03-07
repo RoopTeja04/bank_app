@@ -1,5 +1,6 @@
 package com.example.demo.controller;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -14,8 +15,10 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.demo.Repo.TransactionsRepo;
 import com.example.demo.Repo.UsersRepo;
 import com.example.demo.entity.Accounts;
+import com.example.demo.entity.Transactions;
 
 @RestController
 @CrossOrigin(origins = "http://localhost:5173/")
@@ -23,6 +26,9 @@ public class UserController {
 
     @Autowired
     UsersRepo userrepo;
+
+    @Autowired
+    TransactionsRepo TransactionsRepo;
 
     @PostMapping("/api/users")
     public ResponseEntity<Accounts> saveUser(@RequestBody Accounts users) {
@@ -32,6 +38,11 @@ public class UserController {
     @GetMapping("/api/users")
     public ResponseEntity<List<Accounts>> getUsers() {
         return new ResponseEntity<>(userrepo.findAll(), HttpStatus.OK);
+    }
+
+    @GetMapping("/api/transactions")
+    public ResponseEntity<List<Transactions>> getTransactions(){
+        return new ResponseEntity<>(TransactionsRepo.findAll(), HttpStatus.OK);
     }
 
     @GetMapping("/api/users/{accountNumber}")
@@ -60,30 +71,53 @@ public class UserController {
         }
     }
 
-    @PutMapping("/api/updatebalances-from/{fromaccountNumber}")
-    public ResponseEntity<Accounts> updateFromBalances(@PathVariable String fromaccountNumber, @RequestBody Accounts userAccount) {
-        Optional<Accounts> Fromuser  = userrepo.findByAccountNumber(fromaccountNumber);
-        if (Fromuser.isPresent()) {
-            Fromuser.get().setBalance(userAccount.getBalance());
-            userrepo.save(Fromuser.get());  
+    @PutMapping("/api/updatebalances-from/{fromaccountNumber}/{toaccountnumber}/{transferAmount}")
+    public ResponseEntity<Accounts> updateFromBalances(@PathVariable String fromaccountNumber, @PathVariable String toaccountnumber, @PathVariable String transferAmount, @RequestBody Accounts userAccount) {
+        Optional<Accounts> fromUser = userrepo.findByAccountNumber(fromaccountNumber);
+        
+        if (fromUser.isPresent()) {
+
+            fromUser.get().setBalance(userAccount.getBalance());
+            userrepo.save(fromUser.get());  
+
+            Transactions debitTransaction = new Transactions(
+                fromaccountNumber,
+                toaccountnumber,
+                userAccount.getBalance(),  
+                transferAmount,
+                "DEBIT",
+                LocalDateTime.now()
+            );
+            TransactionsRepo.save(debitTransaction);
+        
             return new ResponseEntity<>(HttpStatus.OK);
-        }
-        else{
+        } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
 
-    @PutMapping("/api/updatebalances-to/{toaccountnumber}")
-    public ResponseEntity<Accounts> updateToBalances(@PathVariable String toaccountnumber, @RequestBody Accounts userAccount) {
-        Optional<Accounts> Touser  = userrepo.findByAccountNumber(toaccountnumber);
-        if (Touser.isPresent()) {
-            Touser.get().setBalance(userAccount.getBalance());
-            userrepo.save(Touser.get());  
+    @PutMapping("/api/updatebalances-to/{toaccountnumber}/{fromaccountnumber}/{transferAmount}")
+    public ResponseEntity<Accounts> updateToBalances(@PathVariable String toaccountnumber, @PathVariable String fromaccountnumber, @PathVariable String transferAmount, @RequestBody Accounts userAccount) {
+        Optional<Accounts> toUser = userrepo.findByAccountNumber(toaccountnumber);
+        
+        if (toUser.isPresent()) {
+
+            toUser.get().setBalance(userAccount.getBalance());
+            userrepo.save(toUser.get());  
+
+            Transactions creditTransaction = new Transactions(
+                fromaccountnumber,
+                toaccountnumber,
+                userAccount.getBalance(),
+                transferAmount,
+                "CREDIT",
+                LocalDateTime.now()
+            );
+            TransactionsRepo.save(creditTransaction);
+
             return new ResponseEntity<>(HttpStatus.OK);
-        }
-        else{
+        } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
-
 }
