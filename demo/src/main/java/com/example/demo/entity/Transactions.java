@@ -17,12 +17,11 @@ public class Transactions {
 
     private String fromAccountNumber;
     private String toAccountNumber;
-    private String amount;  // This represents the updated balance after transaction
-    private String transferAmount; // This represents the actual transferred amount
+    private String amount;  
+    private String transferAmount;
     private String transactionsType;
     private LocalDateTime transactionsDate;
 
-    // Correct Constructor
     public Transactions(String fromAccountNumber, String toAccountNumber, String amount, String transferAmount, String transactionsType, LocalDateTime transactionsDate) {
         this.fromAccountNumber = fromAccountNumber;
         this.toAccountNumber = toAccountNumber;
@@ -32,10 +31,8 @@ public class Transactions {
         this.transactionsDate = transactionsDate;
     }
 
-    // Default constructor (needed for JPA)
     public Transactions() {}
 
-    // Getters and Setters
     public long getId() {
         return id;
     }
